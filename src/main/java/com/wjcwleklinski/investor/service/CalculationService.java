@@ -5,6 +5,8 @@ import com.wjcwleklinski.investor.repository.CalculationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class CalculationService {
 
@@ -13,5 +15,9 @@ public class CalculationService {
 
     public Calculation save(Calculation calculation) {
         return calculationRepository.save(calculation);
+    }
+
+    public List<Calculation> findAll() {
+        return (List<Calculation>) calculationRepository.findAll();
     }
 }

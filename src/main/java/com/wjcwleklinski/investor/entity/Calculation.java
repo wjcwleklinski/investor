@@ -38,9 +38,9 @@ public class Calculation {
         this.id = id;
     }
 
-    public Investment getInvestment() {
-        return investment;
-    }
+//    public Investment getInvestment() {
+//        return investment;
+//    }
 
     public void setInvestment(Investment investment) {
         this.investment = investment;

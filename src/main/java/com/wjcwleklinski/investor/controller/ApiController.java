@@ -76,6 +76,35 @@ public class ApiController {
         output.put("profit", calculation.getProfit());
 
         return output;
+    }
 
+    @GetMapping(path = "/investments/{id}/calculations")
+    public Investment listCalculations(@PathVariable("id") Long id) {
+
+        Investment investment = investmentService.findById(id).get();
+
+        return investment;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
