@@ -1,9 +1,8 @@
 package com.wjcwleklinski.investor.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import com.wjcwleklinski.investor.util.CalculationAlgorithmFactory;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -15,6 +14,7 @@ public class Calculation {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "investment_id")
     private Investment investment;
 
     private BigDecimal amount;
@@ -24,6 +24,11 @@ public class Calculation {
     private String algorithm;
 
     private BigDecimal profit;
+
+
+    public void updateCalculationDate() {
+        this.calculationDate = LocalDate.now();
+    }
 
     public Long getId() {
         return id;

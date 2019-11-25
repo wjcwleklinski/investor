@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InvestmentService {
@@ -20,5 +21,9 @@ public class InvestmentService {
 
     public List<Investment> findAll() {
         return (List<Investment>) investmentRepository.findAll();
+    }
+
+    public Optional<Investment> findById(Long id) {
+        return investmentRepository.findById(id);
     }
 }

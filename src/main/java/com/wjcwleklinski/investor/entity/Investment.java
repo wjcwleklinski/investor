@@ -3,7 +3,10 @@ package com.wjcwleklinski.investor.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Entity
@@ -15,7 +18,7 @@ public class Investment {
 
     private String name;
 
-    private Integer rate;
+    private BigDecimal rate;
 
     private Integer capitalisationPeriod;
 
@@ -23,18 +26,30 @@ public class Investment {
 
     private LocalDate endDate;
 
-    @OneToMany(mappedBy = "investment", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "investment", cascade = CascadeType.ALL)
     private List<Calculation> calculations;
 
     private Long calculationsCounter;
 
     public void addCalculation(Calculation calculation) {
         this.calculations.add(calculation);
+        calculation.setInvestment(this);
+    }
+
+    public void removeCalculation(Calculation calculation) {
+        this.calculations.remove(calculation);
+        calculation.setInvestment(null);
+    }
+
+    public Integer calculateDurationInDays() {
+//        return ChronoUnit.DAYS.between(startDate, endDate);
+        Period period = Period.between(startDate, endDate);
+        return period.getYears() * 360 + period.getMonths() * 30 + period.getDays();
     }
 
     public Investment() {}
 
-    public Investment(String name, Integer rate, Integer capitalisationPeriod, LocalDate startDate, LocalDate endDate) {
+    public Investment(String name, BigDecimal rate, Integer capitalisationPeriod, LocalDate startDate, LocalDate endDate) {
         this.name = name;
         this.rate = rate;
         this.capitalisationPeriod = capitalisationPeriod;
@@ -58,11 +73,11 @@ public class Investment {
         this.name = name;
     }
 
-    public Integer getRate() {
+    public BigDecimal getRate() {
         return rate;
     }
 
-    public void setRate(Integer rate) {
+    public void setRate(BigDecimal rate) {
         this.rate = rate;
     }
 

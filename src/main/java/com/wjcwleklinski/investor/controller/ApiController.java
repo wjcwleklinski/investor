@@ -1,7 +1,11 @@
 package com.wjcwleklinski.investor.controller;
 
+import com.wjcwleklinski.investor.entity.Calculation;
 import com.wjcwleklinski.investor.entity.Investment;
+import com.wjcwleklinski.investor.service.CalculationService;
 import com.wjcwleklinski.investor.service.InvestmentService;
+import com.wjcwleklinski.investor.util.CalculationAlgorithm;
+import com.wjcwleklinski.investor.util.CalculationAlgorithmFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -10,9 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api")
@@ -21,23 +24,58 @@ public class ApiController {
     @Autowired
     private InvestmentService investmentService;
 
-    @PostMapping(path = "/investments")
-    public ResponseEntity<Investment> addInvestment(@RequestBody Investment investment )//Map<String, Object> incomingInvestment)
-    {
+    @Autowired
+    private CalculationService calculationService;
 
-//        String name = (String) incomingInvestment.get("name");
-//        Integer rate = (Integer) incomingInvestment.get("interestRate");
-//        Integer capitalizationPeriod = (Integer) incomingInvestment.get("capitalizationPeriod");
-//        LocalDate startDate = (LocalDate) incomingInvestment.get("startDate");
-//        LocalDate endDate = (LocalDate) incomingInvestment.get("endDate");
-//
-//        Investment investment = new Investment(name, rate, capitalizationPeriod, startDate, endDate);
+    @PostMapping(path = "/investments")
+    public Map<String, Object> addInvestment(@RequestBody Investment investment )
+    {
         investmentService.save(investment);
-        return new ResponseEntity<>(investment, HttpStatus.OK);
+        Map<String, Object> output = new HashMap<>();
+        output.put("id", investment.getId());
+        output.put("name", investment.getName());
+        output.put("rate", investment.getRate());
+        output.put("duration in days", investment.calculateDurationInDays());
+        return output;
     }
 
     @GetMapping(path = "/investments")
-    public List<Investment> listInvestments() {
-        return investmentService.findAll();
+    public List<Map<String, Object>> listInvestments() {
+
+        List<Investment> investments = investmentService.findAll();
+        List<Map<String, Object>> output = investments.stream().map(inv -> {
+            Map<String, Object> obj = new HashMap<>();
+            obj.put("id", inv.getId());
+            obj.put("name", inv.getName());
+            return obj;
+        }).collect(Collectors.toList());
+
+        return output;
+    }
+
+    @PostMapping(path = "/investments/{id}/calculations")
+    public Map<String, Object> addCalculation(@PathVariable("id") Long id,
+                                                      @RequestBody Calculation calculation) {
+
+        Investment investment = investmentService.findById(id).get();
+        investment.addCalculation(calculation);
+
+        calculation.updateCalculationDate();
+
+        CalculationAlgorithm algorithm = CalculationAlgorithmFactory.provideAlgorithm(calculation.getAlgorithm());
+        calculation.setProfit(algorithm.computeProfit(calculation.getAmount(),
+                investment.getRate(), investment.getCapitalisationPeriod(), investment.calculateDurationInDays()));
+
+        calculationService.save(calculation);
+
+        Map<String, Object> output = new HashMap<>();
+        output.put("amount", calculation.getAmount());
+        output.put("calculation date", calculation.getCalculationDate());
+        output.put("investment", investment.getName());
+        output.put("algorithm", calculation.getAlgorithm());
+        output.put("profit", calculation.getProfit());
+
+        return output;
+
     }
 }
