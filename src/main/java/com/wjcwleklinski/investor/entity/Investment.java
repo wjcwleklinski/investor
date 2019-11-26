@@ -1,8 +1,10 @@
 package com.wjcwleklinski.investor.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.wjcwleklinski.investor.validation.DateChronology;
 
 import javax.persistence.*;
+import javax.validation.constraints.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
@@ -10,26 +12,41 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Entity
+//@DateChronology(startDate = "startDate", endDate = "endDate")
 public class Investment {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty(message = "Provide investments name")
     private String name;
 
+    @DecimalMin("0.01")
+    @DecimalMax("1.00")
+    @NotNull(message = "Provide investments rate")
     private BigDecimal rate;
 
+    @Min(1)
+    @Max(12)
+    @NotNull(message = "Provide capitalisation period in months")
     private Integer capitalisationPeriod;
 
+    @NotNull(message = "Provide start date")
     private LocalDate startDate;
 
+    @NotNull(message = "Provide end date")
     private LocalDate endDate;
 
     @OneToMany(mappedBy = "investment", cascade = CascadeType.ALL)
     private List<Calculation> calculations;
 
     private Long calculationsCounter;
+
+    @AssertTrue(message = "startDate and endDate are not in chronological order")
+    public boolean isValid() {
+        return startDate.isBefore(endDate);
+    }
 
     public void addCalculation(Calculation calculation) {
         this.calculations.add(calculation);

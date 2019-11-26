@@ -11,6 +11,7 @@ import com.wjcwleklinski.investor.util.CalculationAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class ApiController {
     private CalculationService calculationService;
 
     @PostMapping(path = "/investments")
-    public Map<String, Object> addInvestment(@RequestBody Investment investment )
+    public Map<String, Object> addInvestment(@Valid @RequestBody Investment investment )
     {
         investmentService.save(investment);
         Map<String, Object> output = new HashMap<>();
