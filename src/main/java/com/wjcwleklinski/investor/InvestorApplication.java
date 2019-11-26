@@ -7,16 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.format.Formatter;
 
-import java.text.ParseException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 @SpringBootApplication
+@EnableCaching
 public class InvestorApplication {
 
 	public static void main(String[] args) {

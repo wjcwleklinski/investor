@@ -9,6 +9,8 @@ import com.wjcwleklinski.investor.service.CalculationService;
 import com.wjcwleklinski.investor.service.InvestmentService;
 import com.wjcwleklinski.investor.util.CalculationAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,8 +27,8 @@ public class ApiController {
     @Autowired
     private CalculationService calculationService;
 
-    @PostMapping(path = "/investments")
-    public Map<String, Object> addInvestment(@Valid @RequestBody Investment investment )
+    @RequestMapping(path = "/investments", method = RequestMethod.POST)
+    public ResponseEntity addInvestment(@Valid @RequestBody Investment investment )
     {
         investmentService.save(investment);
         Map<String, Object> output = new HashMap<>();
@@ -34,11 +36,11 @@ public class ApiController {
         output.put("name", investment.getName());
         output.put("rate", investment.getRate());
         output.put("duration in days", investment.calculateDurationInDays());
-        return output;
+        return ResponseEntity.status(HttpStatus.OK).body(output);
     }
 
-    @GetMapping(path = "/investments")
-    public List<Map<String, Object>> listInvestments() {
+    @RequestMapping(path = "/investments", method = RequestMethod.GET)
+    public ResponseEntity listInvestments() {
 
         List<Investment> investments = investmentService.findAll();
         List<Map<String, Object>> output = investments.stream().map(inv -> {
@@ -48,11 +50,11 @@ public class ApiController {
             return obj;
         }).collect(Collectors.toList());
 
-        return output;
+        return ResponseEntity.status(HttpStatus.OK).body(output);
     }
 
-    @PostMapping(path = "/investments/{id}/calculations")
-    public Map<String, Object> addCalculation(@PathVariable("id") Long id,
+    @RequestMapping(path = "/investments/{id}/calculations", method = RequestMethod.POST)
+    public ResponseEntity addCalculation(@PathVariable("id") Long id,
                                                       @RequestBody Calculation calculation) {
 
         Optional<Investment> optionalInvestment = investmentService.findById(id);
@@ -78,6 +80,8 @@ public class ApiController {
 
         calculation.setProfit(calculationService.calculateProfit(calculation, investment));
 
+        investment.updateCalculationsCounter();
+
         calculationService.save(calculation);
 
         Map<String, Object> output = new HashMap<>();
@@ -87,17 +91,17 @@ public class ApiController {
         output.put("algorithm", calculation.getAlgorithm());
         output.put("profit", calculation.getProfit());
 
-        return output;
+        return ResponseEntity.status(HttpStatus.OK).body(output);
     }
 
-    @GetMapping(path = "/investments/{id}/calculations")
-    public Investment listCalculations(@PathVariable("id") Long id) {
+    @RequestMapping(path = "/investments/{id}/calculations", method = RequestMethod.GET)
+    public ResponseEntity listCalculations(@PathVariable("id") Long id) {
 
         Optional<Investment> optionalInvestment = investmentService.findById(id);
         if (!optionalInvestment.isPresent()) {
             throw new InvestmentNotFoundException(id);
         }
-        return optionalInvestment.get();
+        return ResponseEntity.status(HttpStatus.OK).body(optionalInvestment.get());
     }
 }
 

@@ -2,6 +2,7 @@ package com.wjcwleklinski.investor.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wjcwleklinski.investor.validation.DateChronology;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -41,7 +42,8 @@ public class Investment {
     @OneToMany(mappedBy = "investment", cascade = CascadeType.ALL)
     private List<Calculation> calculations;
 
-    private Long calculationsCounter;
+    @Column(columnDefinition = "Integer default 0")
+    private Integer calculationsCounter = 0;
 
     @AssertTrue(message = "startDate and endDate are not in chronological order")
     public boolean isValid() {
@@ -62,6 +64,11 @@ public class Investment {
 //        return ChronoUnit.DAYS.between(startDate, endDate);
         Period period = Period.between(startDate, endDate);
         return period.getYears() * 360 + period.getMonths() * 30 + period.getDays();
+    }
+
+    @Transactional
+    public void updateCalculationsCounter() {
+        this.calculationsCounter++;
     }
 
     public Investment() {}
@@ -122,11 +129,11 @@ public class Investment {
         this.endDate = endDate;
     }
 
-    public Long getCalculationsCounter() {
+    public Integer getCalculationsCounter() {
         return calculationsCounter;
     }
 
-    public void setCalculationsCounter(Long calculationsCounter) {
+    public void setCalculationsCounter(Integer calculationsCounter) {
         this.calculationsCounter = calculationsCounter;
     }
 
