@@ -62,9 +62,9 @@ public class ApiController {
 
         calculation.updateCalculationDate();
 
-        CalculationAlgorithm algorithm = CalculationAlgorithmFactory.provideAlgorithm(calculation.getAlgorithm());
-        calculation.setProfit(algorithm.computeProfit(calculation.getAmount(),
-                investment.getRate(), investment.getCapitalisationPeriod(), investment.calculateDurationInDays()));
+        //todo: check provided algorithm name correctness
+        //todo: check date for oncalculationdatealgo
+        calculation.setProfit(calculationService.calculateProfit(calculation, investment));
 
         calculationService.save(calculation);
 
