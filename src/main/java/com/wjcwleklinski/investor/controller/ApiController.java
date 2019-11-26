@@ -2,18 +2,15 @@ package com.wjcwleklinski.investor.controller;
 
 import com.wjcwleklinski.investor.entity.Calculation;
 import com.wjcwleklinski.investor.entity.Investment;
+import com.wjcwleklinski.investor.exception.InvestmentNotFoundException;
+import com.wjcwleklinski.investor.exception.WrongAlgorithmNameException;
+import com.wjcwleklinski.investor.exception.WrongCalculationDateException;
 import com.wjcwleklinski.investor.service.CalculationService;
 import com.wjcwleklinski.investor.service.InvestmentService;
 import com.wjcwleklinski.investor.util.CalculationAlgorithm;
-import com.wjcwleklinski.investor.util.CalculationAlgorithmFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,13 +54,27 @@ public class ApiController {
     public Map<String, Object> addCalculation(@PathVariable("id") Long id,
                                                       @RequestBody Calculation calculation) {
 
-        Investment investment = investmentService.findById(id).get();
+        Optional<Investment> optionalInvestment = investmentService.findById(id);
+        if (!optionalInvestment.isPresent()) {
+            throw new InvestmentNotFoundException(id);
+        }
+
+        Investment investment = optionalInvestment.get();
         investment.addCalculation(calculation);
 
         calculation.updateCalculationDate();
 
-        //todo: check provided algorithm name correctness
-        //todo: check date for oncalculationdatealgo
+        if ( !(calculation.getAlgorithm().equals(CalculationAlgorithm.ON_CALCULATION_DATE) ||
+            calculation.getAlgorithm().equals(CalculationAlgorithm.ON_INVESTMENTS_END)) ) {
+            throw new WrongAlgorithmNameException(calculation.getAlgorithm());
+        }
+
+        if (calculation.getAlgorithm().equals(CalculationAlgorithm.ON_CALCULATION_DATE) &&
+                (calculation.getCalculationDate().isBefore(investment.getStartDate()) ||
+                calculation.getCalculationDate().isAfter(investment.getEndDate()) ) ) {
+            throw new WrongCalculationDateException(investment.getId(), calculation.getCalculationDate());
+        }
+
         calculation.setProfit(calculationService.calculateProfit(calculation, investment));
 
         calculationService.save(calculation);
@@ -81,9 +92,11 @@ public class ApiController {
     @GetMapping(path = "/investments/{id}/calculations")
     public Investment listCalculations(@PathVariable("id") Long id) {
 
-        Investment investment = investmentService.findById(id).get();
-
-        return investment;
+        Optional<Investment> optionalInvestment = investmentService.findById(id);
+        if (!optionalInvestment.isPresent()) {
+            throw new InvestmentNotFoundException(id);
+        }
+        return optionalInvestment.get();
     }
 }
 

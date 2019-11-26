@@ -15,15 +15,9 @@ public class OnCalculationDateAlgorithm implements CalculationAlgorithm {
         Period period = Period.between(investment.getStartDate(), calculation.getCalculationDate());
         Integer durationInMonths = ( 360 * period.getYears() + 30 * period.getMonths() + period.getDays()) / 30;
 
-        // to je zle chyba
         Integer passedCapitalisationCount = durationInMonths / investment.getCapitalisationPeriod();
 
-
-
-//
-//        BigDecimal durationInYears = BigDecimal.valueOf(((double) 360 * period.getYears() + 30 * period.getMonths() + period.getDays()) / 360);
         BigDecimal capitalisationCount = BigDecimal.valueOf(12 / investment.getCapitalisationPeriod());
-
 
         BigDecimal result = investment.getRate().divide(capitalisationCount).add(BigDecimal.ONE);
         result = result.pow(passedCapitalisationCount);
