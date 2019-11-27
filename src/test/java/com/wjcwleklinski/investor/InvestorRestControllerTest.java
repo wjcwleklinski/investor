@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.wjcwleklinski.investor.controller.ApiController;
-import com.wjcwleklinski.investor.entity.Calculation;
-import com.wjcwleklinski.investor.entity.Investment;
 import com.wjcwleklinski.investor.util.CalculationAlgorithm;
 import org.junit.Assert;
 import org.junit.Before;
@@ -15,7 +13,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -26,7 +23,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,9 +37,6 @@ public class InvestorRestControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private TestRestTemplate template;
 
 
     @Before
