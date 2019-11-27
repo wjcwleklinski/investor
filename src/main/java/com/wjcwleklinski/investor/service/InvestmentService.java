@@ -30,7 +30,7 @@ public class InvestmentService {
     @Cacheable
     public List<Investment> findAll() {
         investments = (List<Investment>) investmentRepository.findAll();
-        logger.info("Getting investments");
+        logger.info("Investments stored in cache");
         return investments;
     }
 

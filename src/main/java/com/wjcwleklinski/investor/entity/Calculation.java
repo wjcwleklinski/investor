@@ -25,6 +25,13 @@ public class Calculation {
 
     private BigDecimal profit;
 
+    public Calculation(BigDecimal amount, LocalDate calculationDate, String algorithm) {
+        this.amount = amount;
+        this.calculationDate = calculationDate;
+        this.algorithm = algorithm;
+    }
+
+    public Calculation() {}
 
     public void updateCalculationDate() {
         this.calculationDate = LocalDate.now();
