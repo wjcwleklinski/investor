@@ -1,14 +1,13 @@
 package com.wjcwleklinski.investor.validation;
 
 
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.time.LocalDate;
 
-public class DateChronologyValidator implements ConstraintValidator<DateChronology, LocalDate> {
+public class DateChronologyValidator implements ConstraintValidator<DateChronology, Object> {
 
     private String startDateVar;
     private String endDateVar;
@@ -20,7 +19,7 @@ public class DateChronologyValidator implements ConstraintValidator<DateChronolo
     }
 
     @Override
-    public boolean isValid(LocalDate o, ConstraintValidatorContext constraintValidatorContext) {
+    public boolean isValid(Object o, ConstraintValidatorContext constraintValidatorContext) {
 
         try {
             LocalDate startDate = (LocalDate) PropertyUtils.getProperty(o, startDateVar);

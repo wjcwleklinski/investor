@@ -1,6 +1,5 @@
 package com.wjcwleklinski.investor.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wjcwleklinski.investor.validation.DateChronology;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,7 +12,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Entity
-//@DateChronology(startDate = "startDate", endDate = "endDate")
+@DateChronology(startDate = "startDate", endDate = "endDate", message = "Dates chronology is not correct")
 public class Investment {
 
     @Id
@@ -39,16 +38,16 @@ public class Investment {
     @NotNull(message = "Provide end date")
     private LocalDate endDate;
 
-    @OneToMany(mappedBy = "investment", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "investment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Calculation> calculations;
 
     @Column(columnDefinition = "Integer default 0")
     private Integer calculationsCounter = 0;
 
-    @AssertTrue(message = "startDate and endDate are not in chronological order")
-    public boolean isValid() {
-        return startDate.isBefore(endDate);
-    }
+//    @AssertTrue(message = "startDate and endDate are not in chronological order")
+//    public boolean isValid() {
+//        return startDate.isBefore(endDate);
+//    }
 
     public void addCalculation(Calculation calculation) {
         this.calculations.add(calculation);
